@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <title>Hello world</title>
+   </head>
+   <script src = "/socket.io/socket.io.js"></script>
+   <script src="jquery-1.8.1.min.js"></script>
+   <script>
+    $(function(){
+        $("#1").click(function (e) { 
+            $.ajax({
+                type: "GET",
+                url: "http://127.0.0.1:3000/generateHand",
+                data: "data",
+                dataType: "dataType",
+                success: function (response) {
+                    
+                }
+            });
+            
+        });
+        const HOST = "localhost:3000";
+        var socket = io.connect(HOST);
+        socket.on("hand", (arg) => {
+            console.log(arg); // world
+            });
+    })
+   </script>
+   <body>Hello</body>
+   <button id="1"> test </button>
+</html>
