@@ -5,27 +5,91 @@
    </head>
    <script src = "/socket.io/socket.io.js"></script>
    <script src="jquery-1.8.1.min.js"></script>
+   <link rel="stylesheet" type="text/css" href="myCSS.css"/>
    <script>
+   let currentPlayer = 0;
     $(function(){
-        $("#1").click(function (e) { 
+        $("#1").click(function (e) {
             $.ajax({
                 type: "GET",
                 url: "http://127.0.0.1:3000/generateHand",
                 data: "data",
                 dataType: "dataType",
                 success: function (response) {
-                    
+
                 }
             });
-            
         });
         const HOST = "localhost:3000";
         var socket = io.connect(HOST);
         socket.on("hand", (arg) => {
             console.log(arg); // world
+            // make a function
+            //displayHand(arg);
+              createHand(arg[0].hand);
+              //arg[arg.id].hand.forEach((arg) => display(arg));
+            //}
             });
+
     })
+    function display(item) {
+      console.log(item);
+    }
+    function createHand(arg){
+      arg=sortHand(arg);
+      let mytable ="<tr>";
+      for(let i=0;i<arg.length;i++){
+        if(i===arg.length-1){
+          mytable+="<td class='end'>"+arg[i].symbol+"</td>";
+        }
+        else{
+          mytable+="<td class='front'>"+arg[i].symbol+"</td>";
+        }
+      }
+      mytable+="</tr>";
+      $("#myhand").html(mytable);
+    }
+    function sortHand(arg)
+    {
+      for(let i=0;i<arg.length-1;i++)
+      {
+        for(let j=i+1;j<arg.length;j++)
+        {
+          let a=parseInt(arg[i].symbol);
+          let b=parseInt(arg[j].symbol);
+          if(a>13){
+            a+=3;
+          }
+          if(b>13){
+            b+=3;
+          }
+          if(a<3){
+            a+=13;
+          }
+          if(b<3){
+            b+=13;
+          }
+          if(a<b)
+          {
+            let temp=arg[i];
+            arg[i]=arg[j];
+            arg[j]=temp;
+          }
+        }
+      }
+      return arg;
+    }
    </script>
    <body>Hello</body>
    <button id="1"> test </button>
+   <p>Name <input type=textbox id="myName"></input></p>
+   <div id = "lefttop">
+   </div>
+   <div id = "righttop">
+   </div>
+   <div id = "centertop">
+   </div>
+   <div id = "myplayer">
+     <table id ="myhand"><table>
+   </div>
 </html>

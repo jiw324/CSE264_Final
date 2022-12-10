@@ -36,7 +36,7 @@ function generatePlayer(){
     if(cardList.length === 0){
         generateCard();
     }
-    if(playerCount = 3){
+    if(playerCount === 3){
         let landlord = Math.floor(Math.random() * (2 - 0) + 0);
         shuffle(cardList);
         playerHand[0] = new Player(0, landlord === 0 ? true : false, cardList.slice(0, 17));
@@ -114,19 +114,19 @@ function Combination(set){
 //https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
 function shuffle(array) {
     let currentIndex = array.length,  randomIndex;
-  
+
     // While there remain elements to shuffle.
     while (currentIndex != 0) {
-  
+
       // Pick a remaining element.
       randomIndex = Math.floor(Math.random() * currentIndex);
       currentIndex--;
-  
+
       // And swap it with the current element.
       [array[currentIndex], array[randomIndex]] = [
         array[randomIndex], array[currentIndex]];
     }
-  
+
     return array;
   }
 
