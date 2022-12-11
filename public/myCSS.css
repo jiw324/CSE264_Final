@@ -1,12 +1,58 @@
 .front{
   border: 1px black dotted;
-  height:100px;
-  width:30px;
+  height:160px;
+  width:49.44px;
+  font-size:44px;
+  vertical-align:top;
 }
 .end{
   border: 1px black dotted;
-  height:100px;
-  width:61px;
+  height:160px;
+  width:98.88px;
+  font-size:44px;
+  vertical-align:top;
+}
+.sfJ{
+  border: 1px black dotted;
+  height:160px;
+  width:49.44px;
+  font-size:42px;
+  vertical-align:top;
+  text-align: center;
+  writing-mode: vertical-lr;
+  transform: rotate(-180deg);
+}
+.seJ{
+  border: 1px black dotted;
+  height:160px;
+  width:98.88px;
+  font-size:42px;
+  vertical-align:top;
+  text-align: center;
+  writing-mode: vertical-lr;
+  transform: rotate(-180deg);
+}
+.bfJ{
+  border: 1px black dotted;
+  height:160px;
+  width:49.44px;
+  font-size:42px;
+  vertical-align:top;
+  text-align: center;
+  color: red;
+  writing-mode: vertical-lr;
+  transform: rotate(-180deg);
+}
+.beJ{
+  border: 1px black dotted;
+  height:160px;
+  width:98.88px;
+  font-size:42px;
+  vertical-align:top;
+  text-align: center;
+  color: red;
+  writing-mode: vertical-lr;
+  transform: rotate(-180deg);
 }
 #lefttop{
   height:500px;
@@ -27,9 +73,10 @@
   left:800px;
 }
 #myplayer{
+  
   height:200px;
-  width:800px;
+  width:1000px;
   position:absolute;
-  left:200px;
+  left:100px;
   top:650px;
 }

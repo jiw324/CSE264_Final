@@ -23,27 +23,57 @@
         const HOST = "localhost:3000";
         var socket = io.connect(HOST);
         socket.on("hand", (arg) => {
-            console.log(arg); // world
-            // make a function
-            //displayHand(arg);
               createHand(arg[0].hand);
-              //arg[arg.id].hand.forEach((arg) => display(arg));
-            //}
             });
-
     })
-    function display(item) {
-      console.log(item);
-    }
     function createHand(arg){
       arg=sortHand(arg);
       let mytable ="<tr>";
       for(let i=0;i<arg.length;i++){
-        if(i===arg.length-1){
-          mytable+="<td class='end'>"+arg[i].symbol+"</td>";
+        let mydisplay ="";
+        if(parseInt(arg[i].symbol)===14){
+          if(i===arg.length-1){
+            mydisplay="Joker";
+            mytable+="<td class='seJ'>"+mydisplay+"</td>";
+          }
+          else{
+            mydisplay="Joker";
+            mytable+="<td class='sfJ'>"+mydisplay+"</td>";
+          }
+        }
+        else if(parseInt(arg[i].symbol)===15){
+          if(i===arg.length-1){
+            mydisplay="Joker";
+            mytable+="<td class='beJ'>"+mydisplay+"</td>";
+          }
+          else{
+            mydisplay="Joker";
+            mytable+="<td class='bfJ'>"+mydisplay+"</td>";
+          }
         }
         else{
-          mytable+="<td class='front'>"+arg[i].symbol+"</td>";
+          if(parseInt(arg[i].symbol)===11)
+          {
+            mydisplay="J";
+          }
+          else if(parseInt(arg[i].symbol)===12){
+            mydisplay="Q";
+          }
+          else if(parseInt(arg[i].symbol)===13){
+            mydisplay="K";
+          }
+          else if(parseInt(arg[i].symbol)===1){
+            mydisplay="A";
+          }
+          else{
+            mydisplay=arg[i].symbol;
+          }
+          if(i===arg.length-1){
+            mytable+="<td class='end'>"+mydisplay+"</td>";
+          }
+          else{
+            mytable+="<td class='front'>"+mydisplay+"</td>";
+          }
         }
       }
       mytable+="</tr>";
