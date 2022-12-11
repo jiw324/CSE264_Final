@@ -29,20 +29,18 @@ class Player{
 let cardList = [];
 let playerHand = [];
 let playerName = [];
-let playerCount = 0;
+let playerCount = -1;
 const cardranking = new Map();
 
 function generatePlayer(){
     if(cardList.length === 0){
         generateCard();
     }
-    if(playerCount === 3){
-        let landlord = Math.floor(Math.random() * (2 - 0) + 0);
-        shuffle(cardList);
-        playerHand[0] = new Player(0, playerName[0], landlord === 0 ? true : false, cardList.slice(0, 17));
-        playerHand[1] = new Player(1, playerName[1], landlord === 1 ? true : false, cardList.slice(18, 35));
-        playerHand[2] = new Player(2, playerName[2], landlord === 2 ? true : false, cardList.slice(36, 53));
-    }
+    let landlord = Math.floor(Math.random() * (2 - 0) + 0);
+    shuffle(cardList);
+    playerHand[0] = new Player(0, playerName[0], landlord === 0 ? true : false, cardList.slice(0, 17));
+    playerHand[1] = new Player(1, playerName[1], landlord === 1 ? true : false, cardList.slice(18, 35));
+    playerHand[2] = new Player(2, playerName[2], landlord === 2 ? true : false, cardList.slice(36, 53));    
 }
 
 function generateCard(){
@@ -145,9 +143,29 @@ app.use(express.static(publicPath));
 app.post("/login", (req, res) => {
     header(res);
     playerName[playerCount] = req.body.name;
-    if(playerCount === 3) generatePlayer();
-    res.write(JSON.stringify(playerCount++));
-    res.end();
+    playerCount += 1;
+    io.sockets.emit("curPlayer", playerCount);
+    if(playerCount == 2) {
+        generatePlayer();
+        res.write(JSON.stringify(2));
+        res.end();
+    }else {
+        res.write(JSON.stringify(playerCount));
+        res.end();
+    }
+});
+
+app.get("/start", (req, res) => {
+    header(res);
+    if(playerCount === 2){
+        io.sockets.emit("curPlayer", 4);
+        io.sockets.emit("hand", playerHand);
+        res.write(JSON.stringify(1));
+        res.end();
+    }else{
+        res.write(JSON.stringify(0));
+        res.end();
+    }
 });
 
 app.get("/submit", (req, res) => {
@@ -190,21 +208,3 @@ io.on('connection',
 );
 
 server.listen(PORT, HOST, () => { console.log(`Server running at http://${HOST}:${PORT}/`); });
-
-
-
-
-
-
-//
-function doAjaxCall(method,  cmd, params, fcn) {
-    $.ajax(
-    "http://127.0.0.1:3000/" + cmd,
-    {
-        type: method,
-        processData: true,
-        data: params,
-        dataType: "json",
-        success: function (result) {  console.log(result) },
-    });
-}

@@ -7,25 +7,53 @@
    <script src="jquery-1.8.1.min.js"></script>
    <link rel="stylesheet" type="text/css" href="myCSS.css"/>
    <script>
-   let currentPlayer = 0;
+    let currentPlayer = 0;
+    let numPlayer = 0;
+    const HOST = "127.0.0.1:3000";
+    var socket = io.connect(HOST);
     $(function(){
-        $("#1").click(function (e) {
-            $.ajax({
-                type: "GET",
-                url: "http://127.0.0.1:3000/generateHand",
-                data: "data",
-                dataType: "dataType",
-                success: function (response) {
-
-                }
-            });
+      $("#start").hide();
+      $("#start").click(function (e) { 
+        doAjaxCall("GET", "start", null, (result) => {
+          if(result == 0) alert("Not enough players! \nThree Players needed! \nCurrent number of players is: " + (numPlayer + 1));
+      });
+      });
+      let username = $("#myName").val();
+      $("#1").click(function (e) {
+        doAjaxCall("POST", "login", {name: username}, (result) => {
+          currentPlayer = result; 
         });
-        const HOST = "localhost:3000";
-        var socket = io.connect(HOST);
-        socket.on("hand", (arg) => {
-              createHand(arg[0].hand);
-            });
+        $("#loginBox").hide();
+        $("#start").show();
+      });
+
+      socket.on("curPlayer", (arg) => {
+        if(arg === 4) $("#start").hide();
+        numPlayer = arg;
+      });
+
+      socket.on("hand", (arg) => {
+          createHand(arg[currentPlayer].hand);
+      });
+
+
     })
+
+    function doAjaxCall(method,  cmd, params, fcn) {
+        $.ajax(
+        "http://127.0.0.1:3000/" + cmd,
+        {
+            type: method,
+            processData: true,
+            data: params,
+            dataType: "json",
+            success: function (result) {  fcn(result) },
+        });
+    }
+
+
+
+
     function createHand(arg){
       arg=sortHand(arg);
       let mytable ="<tr>";
@@ -110,9 +138,10 @@
       return arg;
     }
    </script>
-   <body>Hello</body>
-   <button id="1"> test </button>
-   <p>Name <input type=textbox id="myName"></input></p>
+   <div id="loginBox">
+    <button id="1"> Login! </button>
+    <p>Name <input type="text" id="myName"></input></p>
+   </div>
    <div id = "lefttop">
    </div>
    <div id = "righttop">
@@ -122,4 +151,5 @@
    <div id = "myplayer">
      <table id ="myhand"><table>
    </div>
+   <button id="start">Start Game!</button>
 </html>
