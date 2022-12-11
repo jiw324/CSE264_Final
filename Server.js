@@ -314,6 +314,7 @@ app.post("/submit", (req, res) => {
           });
           if(playerHand[req.body.id].size === 0) {
             io.sockets.emit("winner", players[req.body.id].name);
+            res.write(JSON.stringify("asd"));
             res.end();
           }
 

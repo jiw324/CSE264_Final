@@ -88,7 +88,7 @@ let selectCards = new Set();
       });
 
       socket.on("winner", (arg)=>{
-        $("#winner").html(arg);
+        alert("Winner: " + arg);
       });
     })
 
