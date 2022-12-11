@@ -13,7 +13,7 @@
     var socket = io.connect(HOST);
     $(function(){
       $("#start").hide();
-      $("#start").click(function (e) { 
+      $("#start").click(function (e) {
         doAjaxCall("GET", "start", null, (result) => {
           if(result == 0) alert("Not enough players! \nThree Players needed! \nCurrent number of players is: " + (numPlayer + 1));
       });
@@ -21,7 +21,7 @@
       let username = $("#myName").val();
       $("#1").click(function (e) {
         doAjaxCall("POST", "login", {name: username}, (result) => {
-          currentPlayer = result; 
+          currentPlayer = result;
         });
         $("#loginBox").hide();
         $("#start").show();
@@ -35,10 +35,7 @@
       socket.on("hand", (arg) => {
           createHand(arg[currentPlayer].hand);
       });
-
-
     })
-
     function doAjaxCall(method,  cmd, params, fcn) {
         $.ajax(
         "http://127.0.0.1:3000/" + cmd,
@@ -50,10 +47,6 @@
             success: function (result) {  fcn(result) },
         });
     }
-
-
-
-
     function createHand(arg){
       arg=sortHand(arg);
       let mytable ="<tr>";
