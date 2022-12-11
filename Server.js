@@ -28,9 +28,12 @@ class Player{
 
 let cardList = [];
 let playerHand = [];
+let hands = [];
 let playerName = [];
 let playerCount = -1;
 const cardranking = new Map();
+let test = [];
+let previousPlay = [];
 
 function generatePlayer(){
     if(cardList.length === 0){
@@ -38,9 +41,12 @@ function generatePlayer(){
     }
     let landlord = Math.floor(Math.random() * (2 - 0) + 0);
     shuffle(cardList);
-    playerHand[0] = new Player(0, playerName[0], landlord === 0 ? true : false, cardList.slice(0, 17));
-    playerHand[1] = new Player(1, playerName[1], landlord === 1 ? true : false, cardList.slice(18, 35));
-    playerHand[2] = new Player(2, playerName[2], landlord === 2 ? true : false, cardList.slice(36, 53));    
+    hands[0] = new Set(cardList.slice(0, 17));
+    hands[1] = new Set(cardList.slice(18, 35));
+    hands[2] = new Set(cardList.slice(36, 53));
+    playerHand[0] = new Player(0, playerName[0], landlord === 0 ? true : false, Array.from(hands[0]));
+    playerHand[1] = new Player(1, playerName[1], landlord === 1 ? true : false, Array.from(hands[1]));
+    playerHand[2] = new Player(2, playerName[2], landlord === 2 ? true : false, Array.from(hands[2]));    
 }
 
 function generateCard(){
@@ -75,39 +81,87 @@ function generateCard(){
 
 // Do a frequency sort on set before inputting
 function Combination(set){
-    set.sort(function(a,b){return b - a});
+    let temp = [];
+    for(let i = 0; i < set.length; i++){
+        if(temp[set[i].symbol] === undefined){
+            temp[set[i].symbol] = new Card(set[i].symbol, 1);
+        }else{
+            temp[set[i].symbol].symbol += 1;
+        }
+    }
+    temp = temp.filter(function( element ) {
+        return element !== undefined;
+     });
+    temp.sort(function(a,b){return b.symbol - a.symbol});
     switch(set.length){
         case(1):
             return true;
-            break;
         case(2):
-            if(set[0].symbol === set[1].symbol){
-                return true;
-            }
-            if(set[0].symbol === 14 && set[1].symbol == 15){
-                return "rocket";
-            }
-            break;
+            if(temp[1].symbol === 2) return true;
+            if(set[0].symbol === 14 && set[1].symbol == 15) return "rocket";
+            return false;
         case(3):
-            if(set[0].symbol === set[1].symbol && set[0].symbol === set[2].symbol){
-                return true;
-            }
-            break;
+            if(temp[0].symbol === 3) return true;
+            return false;
         case(4):
-            if(set[0].symbol === set[1].symbol && set[0].symbol === set[2].symbol && set[0].symbol === set[3].symbol){
-                return "bomb";
-            }
-            break;
+            if(temp[0].symbol === 4)return "bomb";
+            else if(temp[0].symbol === 3 && temp[1].symbol === 1) return true;
+            return false;
         case(5):
-            break;
+            if(temp[0].symbol === 3 && temp[1].symbol === 2){
+                return "bomb";
+            }else return sequenceSet(temp);
         case(6):
-            break;
+            if(temp[0].symbol === 4 && temp[1].symbol === 1 && temp[2].symbol === 1){
+                return true;
+            } else return sequenceSet(temp);
         case(8):
-            break;
-        case(10):
-            break;
+        if(temp[0].symbol === 4 && temp[1].symbol === 2 && temp[2].symbol === 2){
+            return true;
+        }else return sequenceSet(temp);
+        default:
+            return sequenceSet(temp);
     }
 }
+
+function sequenceSet(temp){
+    console.log(temp);
+    let counter = 1;
+    let additionalCards = 0;
+    // checks 3-of-a-kind Sequence (at least 2): 7-7-7-8-8-8
+    for(let i = 1; i < temp.length; i++){
+        if(temp[i].symbol === 3 && temp[i-1].symbol === 3 && temp[i].id - 1 === temp[i-1].id) counter+=1;
+    }
+    additionalCards = counter;
+    if(counter > 1 && temp.length - counter != counter) return false;
+    else if(counter > 1){
+        // checks 3-of-a-kind Sequence plus cards: 10-10-10-J-J-J-3-5
+        for(let i = 0; i < additionalCards; i++){
+            if(temp[i + additionalCards].symbol === 1) counter+=1;
+        }
+        if(counter === temp.length) return true;
+        counter = additionalCards;
+        // 3-of-a-kind Sequence plus pairs: Q-Q-Q-K-K-K-3-3-9-9
+        for(let i = 0; i < additionalCards; i++){
+            if(temp[i + additionalCards].symbol === 2) counter+=1;
+        }
+        if(counter === temp.length) return true;
+        counter = 0;
+    }
+    // checks Pair Sequence (at least 3 pairs): 4-4-5-5-6-6
+    for(let i = 1; i < temp.length; i++){
+        if(temp[i].symbol === 2 && temp[i-1].symbol === 2 && temp[i].id - 1 === temp[i-1].id) counter+=1;
+    }
+    if(counter === temp.length) return true;
+    counter = 0;
+    // checks Sequence (at least 5 cards): 3-4-5-6-7
+    for(let i = 1; i < temp.length; i++){
+        if(temp[i].id - 1 != temp[i-1].id) counter+=1;
+    }
+    if(counter === temp.length) return true;
+    return false;
+}
+
 
 //https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
 function shuffle(array) {
@@ -170,7 +224,19 @@ app.get("/start", (req, res) => {
 
 app.get("/submit", (req, res) => {
     header(res);
-    res.write(Combination(req.body.set));
+    test[0] = new Card(1, 4);
+    test[1] = new Card(2, 4);
+    test[2] = new Card(3, 4);
+    test[3] = new Card(4, 4);
+    test[4] = new Card(5, 5);
+    test[5] = new Card(6, 5);
+    test[6] = new Card(5, 7);
+    test[7] = new Card(6, 7);
+    //test[8] = new Card(5, 1);
+   // test[9] = new Card(6, 1);
+    let result = Combination(test);
+    if(result) previousPlay = test;
+    res.write(JSON.stringify(result));
     res.end();
 });
 
