@@ -24,7 +24,7 @@ class Card{
 
 /**
  * PLayer object
- * ID of player 
+ * ID of player
  * Landlord for turn
  * Hand of player
  */
@@ -54,21 +54,32 @@ let test = [];
 // Holds the previously played set
 let previousPlay = [];
 // rank of the previously played set
-let prevRank = -1;
+let prevRank = 20;
+
+let timer = null;
 
 // Generates 3 players with IDs 0,1,2, randomly picks a landlord and give each a 17 cards
 function generatePlayer(){
     if(cardList.length === 0){
         generateCard();
     }
-    let landlord = Math.floor(Math.random() * (2 - 0) + 0);
-    shuffle(cardList);
-    playerHand[0] = new Set(cardList.slice(0, 17));
-    playerHand[1] = new Set(cardList.slice(18, 35));
-    playerHand[2] = new Set(cardList.slice(36, 53));
-    players[0] = new Player(0, playerName[0], landlord === 0 ? true : false, Array.from(playerHand[0]));
-    players[1] = new Player(1, playerName[1], landlord === 1 ? true : false, Array.from(playerHand[1]));
-    players[2] = new Player(2, playerName[2], landlord === 2 ? true : false, Array.from(playerHand[2]));    
+    let landlord = Math.floor(Math.random() * 3);
+    let test = Array.from(cardList);
+    shuffle(test);
+    for(let i=0;i<3;i++)
+    {
+      if(i===0){
+        playerHand[landlord] = new Set(test.slice(0, 20));
+        players[landlord] = new Player(landlord, playerName[landlord], true, Array.from(playerHand[landlord]));
+      }
+      else {
+        playerHand[landlord] = new Set(test.slice((i-1)*17+20,i*17+20));
+        players[landlord] = new Player(landlord, playerName[landlord], false, Array.from(playerHand[landlord]));
+      }
+      landlord++;
+      if(landlord==3)
+        landlord=0;
+    }
 }
 
 // Generates a list of 54 cards and sets the ranking of each
@@ -119,14 +130,13 @@ function Combination(set){
     temp.sort(function(a,b){return b.symbol - a.symbol});
 
     // Check if submitted set is higher rank
-    if(cardranking.get(temp[0].id) > prevRank) return false;
     switch(set.length){
         case(1):    // Checks single play card
             prevRank = cardranking.get(set[0].symbol);
             return true;
         case(2):    // Checks Pair or Two jokers
             if(temp[0].symbol === 2){
-                prevRank = cardranking.get(temp[1].id);
+                prevRank = cardranking.get(temp[0].id);
                 return true;
             }
             if(set[0].symbol === 14 && set[1].symbol == 15){
@@ -138,9 +148,9 @@ function Combination(set){
             if(temp[0].symbol === 3){
                 prevRank = cardranking.get(temp[0].id);
                 return true;
-            } 
+            }
             return false;
-        case(4):    // Checks Quadplex 
+        case(4):    // Checks Quadplex
             if(temp[0].symbol === 4){
                 prevRank = 0;
                 return "bomb";
@@ -171,6 +181,7 @@ function Combination(set){
 }
 
 function sequenceSet(temp){
+  console.log(temp);
     let counter = 1;
     let additionalCards = 0;
     // checks 3-of-a-kind Sequence (at least 2): 7-7-7-8-8-8
@@ -197,7 +208,7 @@ function sequenceSet(temp){
             prevRank = cardranking.get(temp[0].id);
             return true;
         }
-        counter = 0;
+        counter = 1;
     }
     // checks Pair Sequence (at least 3 pairs): 4-4-5-5-6-6
     for(let i = 1; i < temp.length; i++){
@@ -207,10 +218,11 @@ function sequenceSet(temp){
         prevRank = 20;
         return true;
     }
-    counter = 0;
+    counter = 1;
+
     // checks Sequence (at least 5 cards): 3-4-5-6-7
     for(let i = 1; i < temp.length; i++){
-        if(temp[i].id - 1 != temp[i-1].id) counter+=1;
+        if(temp[i].id - 1 === temp[i-1].id) counter+=1;
     }
     if(counter === temp.length){
         prevRank = 20;
@@ -223,19 +235,19 @@ function sequenceSet(temp){
 //https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
 function shuffle(array) {
     let currentIndex = array.length,  randomIndex;
-  
+
     // While there remain elements to shuffle.
     while (currentIndex != 0) {
-  
+
       // Pick a remaining element.
       randomIndex = Math.floor(Math.random() * currentIndex);
       currentIndex--;
-  
+
       // And swap it with the current element.
       [array[currentIndex], array[randomIndex]] = [
         array[randomIndex], array[currentIndex]];
     }
-  
+
     return array;
   }
 
@@ -268,6 +280,7 @@ app.get("/start", (req, res) => {
     if(playerCount === 2){
         io.sockets.emit("curPlayer", 4);
         io.sockets.emit("hand", players);
+        timers(30);
         res.write(JSON.stringify(1));
         res.end();
     }else{
@@ -276,30 +289,49 @@ app.get("/start", (req, res) => {
     }
 });
 
-// Submittion of a combination of cards and checks it for validity 
-app.get("/submit", (req, res) => {
+// Submittion of a combination of cards and checks it for validity
+app.post("/submit", (req, res) => {
     header(res);
-    test[0] = new Card(1, 4);
-    test[1] = new Card(2, 4);
-    test[2] = new Card(3, 4);
-    test[3] = new Card(4, 4);
-    test[4] = new Card(5, 5);
-    test[5] = new Card(6, 5);
-    test[6] = new Card(5, 7);
-    test[7] = new Card(6, 7);
-    //test[8] = new Card(5, 1);
-   // test[9] = new Card(6, 1);
-   if(previousPlay[previousPlay.length] === req.body.id) prevRank = 20;
-    let result = Combination(test);
-    if(result){
-        previousPlay = test;
-        previousPlay[previousPlay.length] = req.body.id;
-        changeTurn();
-        timer();
+    if(previousPlay[previousPlay.length] === req.body.id) prevRank = 20;
+    console.log(req.body);
+    let tmp = new Set();
+    if(req.body.set === '' || req.body.set === 'null'){
+      io.sockets.emit("prev", previousPlay);
+      io.sockets.emit("hand", players);
+      changeTurn();
+      clearInterval(timer);
+      timers(30);
+      res.write(JSON.stringify("asd"));
+    }else{
+      let temp = JSON.parse(req.body.set);
+      temp.forEach((val) => {
+        tmp.add(cardList[parseInt(val)]);
+      });
+      let result = Combination(Array.from(tmp));
+      if(result){
+          tmp.forEach((val) => {
+            playerHand[req.body.id].delete(val);
+          });
+          if(playerHand[req.body.id].size === 0) {
+            io.sockets.emit("winner", players[req.body.id].name);
+            res.end();
+          }
+
+          previousPlay = Array.from(tmp);
+          previousPlay[previousPlay.length] = req.body.id;
+          players[req.body.id].hand = Array.from(playerHand[req.body.id]);
+          io.sockets.emit("prev", previousPlay);
+          io.sockets.emit("hand", players);
+          changeTurn();
+          clearInterval(timer);
+          timers(30);
+      }
+      res.write(JSON.stringify(result));
     }
-    res.write(JSON.stringify(result));
     res.end();
+
 });
+
 
 
 /*
@@ -319,7 +351,7 @@ function changeTurn(){
         if(player.landlord === true){
             landlord = player.id;
             player.landlord = false;
-        } 
+        }
     });
     landlord = landlord - 1;
     if(landlord === -1) landlord = 2;
@@ -328,13 +360,12 @@ function changeTurn(){
 
 
 //https://stackoverflow.com/questions/31559469/how-to-create-a-simple-javascript-timer
-function timer(){
+function timers(sec){
     let landlord = -1;
     players.forEach((player) => {
         if(player.landlord === true) landlord = player.id;
     });
-    var sec = 30;
-    var timer = setInterval(function(){
+    timer = setInterval(function(){
         io.sockets.emit("landlord", landlord);
         io.sockets.emit("timer", sec);
         sec--;

@@ -5,6 +5,64 @@
   font-size:44px;
   vertical-align:top;
 }
+.middlehand{
+  border: 1px black dotted;
+  height:80px;
+  width:49.44px;
+  font-size:44px;
+  vertical-align:top;
+}
+
+#wait{
+  color: black;
+  text-align: center;
+}
+#leftPlayerHand{
+    border: 1px black dotted;
+    height:21.2px;
+    width:100px;
+    font-size:44px;
+    vertical-align:top;
+    background-color: black;
+}
+#example{
+  position: absolute;
+  left: 1200px;
+}
+#lefttable{
+  position: absolute;
+  left: 100px;
+}
+#centertable{
+  position: absolute;
+  left: 100px;
+}
+
+#rightPlayerHand{
+    border: 1px black dotted;
+    height:21.2px;
+    width:100px;
+    font-size:44px;
+    vertical-align:top;
+    background-color: black;
+}
+
+#timer{
+  text-align: center;
+  position: absolute;
+  left: 550px;
+  top: 450px;
+  background-color: lightgray;
+  width: 100px;
+  height: 100px;
+  font-size: 40px;
+  border-radius: 50%
+}
+
+#righttable{
+  position: absolute;
+  left: 100px;
+}
 .end{
   border: 1px black dotted;
   height:160px;
@@ -55,7 +113,7 @@
   transform: rotate(-180deg);
 }
 #lefttop{
-  height:500px;
+  height:600px;
   width:300px;
   position:absolute;
   left:100px;
@@ -67,26 +125,39 @@
   left:450px;
 }
 #righttop{
-  height:500px;
+  height:600px;
   width:300px;
   position:absolute;
   left:800px;
 }
-#myplayer{
-  
-  height:200px;
-  width:1000px;
-  position:absolute;
-  left:100px;
-  top:650px;
+#PassAndPlay{
+  text-align: center;
 }
+#myPlay,#myPass{
+ font-size: 20px;
+}
+#myplayer{
+border: 1px black dotted;
+  height:300px;
+  width:1200px;
+  position:absolute;
+  left:0px;
+  top:650px;
 
+}
+#myhand{
+  margin-left:auto;
+  margin-right:auto;
+}
+#middle{
+  margin-left:auto;
+  margin-right:auto;
+}
 #start{
   font-size: 100px;
   width: 500px;
   height: 300px;
   position: absolute;
   top: 50%;
-  left: 50%;
+  left: 400px;
 }
-
