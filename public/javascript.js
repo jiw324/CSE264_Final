@@ -6,6 +6,7 @@ let selectCards = new Set();
     $(function(){
       $("#startbtn").hide();
       $("#timer").hide();
+      $("#example").hide();
       $("#myplayer").hide();
       $("#PassAndPlay").hide();
       $("#start").click(function (e) {
@@ -32,6 +33,7 @@ let selectCards = new Set();
             if(player.landlord === true) landlord = player.id;
         });
         displayTurn(landlord);
+        $("#example").show();
         $("#myplayer").show();
         let left = true;
         $("#name").html(arg[currentPlayer].name);

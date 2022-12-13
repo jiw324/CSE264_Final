@@ -26,6 +26,8 @@
     background-color: black;
 }
 #example{
+  width:400px;
+  height:600px;
   position: absolute;
   left: 1200px;
 }
@@ -160,4 +162,9 @@ border: 1px black dotted;
   position: absolute;
   top: 50%;
   left: 400px;
+}
+
+
+#body{
+  background-color: aquamarine;
 }
